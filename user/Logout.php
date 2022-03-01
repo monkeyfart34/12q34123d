@@ -16,41 +16,43 @@
  * above mentioned licence for specific details.
  */
 
-require "../include/Bootstrap.php";
-
-require ABSPATH . INC . "DSJAS.php";
-
-require_once ABSPATH . INC . "Customization.php";
+require "../../include/Bootstrap.php";
 
 require ABSPATH . INC . "Users.php";
-require_once ABSPATH . INC . "Util.php";
-
-require_once ABSPATH . INC . "Theme.php";
-require_once ABSPATH . INC . "Module.php";
+require ABSPATH . INC . "Util.php";
 
 
-if (!shouldAttemptLogout()) {
+if (!shouldAttemptLogout(true)) {
     if (!isset($_GET["success"])) {
-        redirect("/user/Login.php?signout_fail=1");
+        redirect("/admin/user/SignIn.php?signout_fail=1");
         die();
     }
 }
 
-// If we've been told to log out immediately, do it now
-if (isset($_GET["logout"]) && $_GET["logout"] == true) {
-    logout();
-    redirect("/user/Logout.php?success=true");
+if (isset($_GET["success"]) && $_GET["success"]) {
+    redirect("/admin/user/SignIn.php?logout_success=1");
     die();
 }
 
+// If we've been told to log out immediately, do it now
+if (isset($_GET["logout"]) && $_GET["logout"]) {
+    logout(true);
+    redirect("/admin/user/Logout.php?success=true");
+    die();
+}
 
-// Jump to main DSJAS load code
-dsjas(
-    __FILE__,
-    "user/",
-    function (string $callbackName, ModuleManager $moduleManager) {
-        $moduleManager->getAllByCallback($callbackName);
-    },
-    "all",
-    ["user"]
-);
+?>
+
+<body>
+    <p style="text-align: left">One moment, you're being signed out...</p>
+
+    <script>
+        console.log("You will be signed out in around 5 seconds, please wait...");
+
+        setTimeout(function() {
+            document.clear();
+            document.writeln("Signing out now...");
+            document.location = "/admin/user/Logout.php?logout=true"
+        }, 750)
+    </script>
+</body>
